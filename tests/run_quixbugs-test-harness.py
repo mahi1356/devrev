@@ -18,7 +18,7 @@ PROGRAMS_DIR = QUIXBUGS_DIR / "python_programs"
 TESTCASES_DIR = QUIXBUGS_DIR / "python_testcases"
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-from main import run  # noqa: E402
+from main_orthestrator import run  # noqa: E402
 
 
 def extract_code(agent_output: str) -> str | None:

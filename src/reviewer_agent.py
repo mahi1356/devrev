@@ -11,13 +11,14 @@ class ReviewerAgent:
         self.client = Client()
         self.model = model
 
-    def run(self, task: str, code: str) -> str:
+    def run(self, task: str, code: str, logger=None, round_num: int = 0) -> str:
         prompt = f"Task:\n{task}\n\nCode to review:\n{code}"
-        response = self.client.chat(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
-        )
-        return response["message"]["content"]
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ]
+        response = self.client.chat(model=self.model, messages=messages)
+        content = response["message"]["content"]
+        if logger:
+            logger.log("reviewer", round_num, self.model, messages, content)
+        return content
