@@ -1,0 +1,362 @@
+<title>Devrev Direct Run</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --ink: #1e1c19;
+    --ink-dim: #726c60;
+    --border: #d9d3c5;
+    --developer: #2f6b4f;
+    --developer-bg: #e6efe8;
+    --reviewer: #3a5a82;
+    --reviewer-bg: #e7edf4;
+    --ollama: #8a6a2f;
+    --ollama-bg: #f1e9d6;
+    --warn: #a8402f;
+    --warn-bg: #f6e6e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a;
+      --surface: #1e2023;
+      --ink: #ece9e2;
+      --ink-dim: #a39c8d;
+      --border: #34362f;
+      --developer: #79b596;
+      --developer-bg: #1e2b24;
+      --reviewer: #8ab0dc;
+      --reviewer-bg: #1c2531;
+      --ollama: #d3ab68;
+      --ollama-bg: #2c2618;
+      --warn: #e0836f;
+      --warn-bg: #2e211d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a;
+    --surface: #1e2023;
+    --ink: #ece9e2;
+    --ink-dim: #a39c8d;
+    --border: #34362f;
+    --developer: #79b596;
+    --developer-bg: #1e2b24;
+    --reviewer: #8ab0dc;
+    --reviewer-bg: #1c2531;
+    --ollama: #d3ab68;
+    --ollama-bg: #2c2618;
+    --warn: #e0836f;
+    --warn-bg: #2e211d;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 40px 24px 64px;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .dek {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    max-width: 62ch;
+    margin: 0 0 36px;
+  }
+  .dek code, .callout code, .notes code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.92em;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.05em 0.35em;
+  }
+  .dek a { color: var(--ink); }
+
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 0 0 32px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 24px;
+  }
+  @media (max-width: 720px) {
+    .steps { grid-template-columns: 1fr; }
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 3px 0 3px 34px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.4px solid var(--ink-dim);
+    color: var(--ink);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps strong { color: var(--ink); font-weight: 600; }
+
+  figure {
+    margin: 0 0 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 20px 16px;
+    overflow-x: auto;
+  }
+  figure svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    min-width: 700px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  figcaption {
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .legend {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    margin-top: 10px;
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 720px) {
+    .notes { grid-template-columns: 1fr; }
+  }
+  .notes h2 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px;
+    color: var(--ink-dim);
+    font-weight: 600;
+  }
+  .notes ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+  .notes li { margin-bottom: 6px; }
+  .notes li::marker { color: var(--ink-dim); }
+
+  .callout {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+  .callout svg { flex: none; margin-top: 3px; width: 16px; height: 16px; }
+  .callout strong { color: var(--warn); }
+</style>
+
+<main>
+  <p class="eyebrow">python3 src/main_orthestrator.py</p>
+  <h1>Direct run — wiring sanity check</h1>
+  <p class="dek">
+    Running <code>main_orthestrator.py</code> on its own (no harness, no dataset) is the
+    fastest way to confirm the developer and reviewer agents can actually reach Ollama and
+    talk to each other. It uses a hardcoded placeholder task and no starting code, and
+    nothing checks whether the output is correct. For a real, verified bug fix see
+    <a href="architecture-diagram.html">the QuixBugs harness diagram</a> instead.
+  </p>
+
+  <ol class="steps">
+    <li><strong>Run the file directly.</strong> <code>python3 src/main_orthestrator.py</code> executes its <code>__main__</code> block, calling <code>run("Describe your task here")</code> with no starting code.</li>
+    <li><strong>Set up the loop.</strong> <code>run()</code> creates a <code>DeveloperAgent</code>, a <code>ReviewerAgent</code>, and a fresh <code>ConversationLogger</code>, which immediately creates <code>logs/&lt;timestamp&gt;.json</code>.</li>
+    <li><strong>Developer responds.</strong> <code>DeveloperAgent.run()</code> sends the placeholder task (plus empty code/feedback) to Ollama; the model's reply becomes the round's <code>code</code>. Logged.</li>
+    <li><strong>Reviewer responds.</strong> <code>ReviewerAgent.run()</code> sends that code to Ollama and either critiques it or replies <code>APPROVED</code>. Logged.</li>
+    <li><strong>Print the round.</strong> The code and review for the round are printed to the console as <code>--- Round N ---</code>.</li>
+    <li><strong>Loop or exit.</strong> If the reply contains <code>"APPROVED"</code> the loop breaks immediately (even on round 1); otherwise it feeds the feedback into another developer round, up to 3 rounds total.</li>
+    <li><strong>Return, no verdict.</strong> The log path is printed and the final code string is returned — nothing runs it, tests it, or checks it against anything.</li>
+  </ol>
+
+  <figure>
+    <svg viewBox="0 0 900 480" role="img" aria-label="Diagram: python3 src/main_orthestrator.py calls run() with a hardcoded placeholder task and no starting code. run() sets up a DeveloperAgent, ReviewerAgent, and ConversationLogger, then loops up to three rounds: the developer calls Ollama to produce code, the reviewer calls Ollama to critique or approve that code, both exchanges are logged, and the round is printed to the console. If the reviewer's reply contains APPROVED the loop exits early. When the loop ends, the log path is printed and the final code is returned with no correctness check performed.">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+        </marker>
+      </defs>
+
+      <!-- entry -->
+      <rect x="20" y="20" width="230" height="80" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.4" />
+      <circle cx="20" cy="20" r="11" fill="var(--ink)" />
+      <text x="20" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="var(--bg)">1</text>
+      <text x="135" y="52" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">python3 src/main_orthestrator.py</text>
+      <text x="135" y="72" text-anchor="middle" font-size="11" fill="var(--ink-dim)">run("Describe your task here")</text>
+      <text x="135" y="90" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">no starting code</text>
+
+      <line x1="250" y1="60" x2="300" y2="60" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+
+      <!-- setup -->
+      <rect x="304" y="20" width="230" height="80" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.4" />
+      <circle cx="304" cy="20" r="11" fill="var(--ink)" />
+      <text x="304" y="24" text-anchor="middle" font-size="11" font-weight="600" fill="var(--bg)">2</text>
+      <text x="419" y="48" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">run() sets up</text>
+      <text x="419" y="66" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">DeveloperAgent + ReviewerAgent</text>
+      <text x="419" y="84" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">ConversationLogger → logs/&lt;ts&gt;.json</text>
+
+      <line x1="419" y1="100" x2="419" y2="128" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+      <text x="432" y="118" font-size="10.5" fill="var(--ink-dim)">≤ 3 rounds</text>
+
+      <!-- loop container -->
+      <rect x="150" y="132" width="540" height="248" rx="12" fill="none" stroke="var(--ink-dim)" stroke-width="1.2" stroke-dasharray="5 4" />
+
+      <!-- developer -->
+      <rect x="182" y="156" width="230" height="80" rx="8" fill="var(--developer-bg)" stroke="var(--developer)" stroke-width="1.4" />
+      <circle cx="182" cy="156" r="11" fill="var(--developer)" />
+      <text x="182" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="var(--developer-bg)">3</text>
+      <text x="297" y="184" text-anchor="middle" font-size="13" font-weight="600" fill="var(--developer)">DeveloperAgent</text>
+      <text x="297" y="203" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">sends task + code + feedback</text>
+      <text x="297" y="220" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">reply becomes new "code"</text>
+
+      <!-- reviewer -->
+      <rect x="182" y="284" width="230" height="80" rx="8" fill="var(--reviewer-bg)" stroke="var(--reviewer)" stroke-width="1.4" />
+      <circle cx="182" cy="284" r="11" fill="var(--reviewer)" />
+      <text x="182" y="288" text-anchor="middle" font-size="11" font-weight="600" fill="var(--reviewer-bg)">4</text>
+      <text x="297" y="312" text-anchor="middle" font-size="13" font-weight="600" fill="var(--reviewer)">ReviewerAgent</text>
+      <text x="297" y="331" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">sends task + code</text>
+      <text x="297" y="348" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">critiques, or replies "APPROVED"</text>
+
+      <path d="M 412 236 C 445 250, 445 270, 412 284" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+      <text x="452" y="264" font-size="10.5" fill="var(--ink-dim)">code</text>
+      <path d="M 182 284 C 150 270, 150 250, 182 236" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+      <text x="140" y="264" font-size="10.5" fill="var(--ink-dim)" text-anchor="middle">feedback</text>
+
+      <!-- ollama -->
+      <rect x="450" y="156" width="220" height="70" rx="8" fill="var(--ollama-bg)" stroke="var(--ollama)" stroke-width="1.4" />
+      <text x="560" y="184" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ollama)">Ollama</text>
+      <text x="560" y="202" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">qwen2.5-coder:7b</text>
+      <text x="560" y="217" text-anchor="middle" font-size="10" fill="var(--ink-dim)">127.0.0.1:11434</text>
+
+      <path d="M 412 196 C 430 190, 435 190, 450 188" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+      <path d="M 412 324 C 460 300, 480 230, 480 226" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+      <text x="565" y="245" font-size="10.5" fill="var(--ink-dim)">both call .chat()</text>
+
+      <!-- console print + logger -->
+      <rect x="450" y="252" width="220" height="60" rx="8" fill="var(--surface)" stroke="var(--ink-dim)" stroke-width="1.2" stroke-dasharray="3 3" />
+      <circle cx="450" cy="252" r="11" fill="var(--ink)" />
+      <text x="450" y="256" text-anchor="middle" font-size="11" font-weight="600" fill="var(--bg)">5</text>
+      <text x="560" y="278" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--ink)">print + log</text>
+      <text x="560" y="296" text-anchor="middle" font-size="10" fill="var(--ink-dim)">console: "--- Round N ---"; logs/&lt;ts&gt;.json</text>
+
+      <!-- approval check -->
+      <rect x="182" y="392" width="498" height="56" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.3" />
+      <circle cx="182" cy="392" r="11" fill="var(--ink)" />
+      <text x="182" y="396" text-anchor="middle" font-size="11" font-weight="600" fill="var(--bg)">6</text>
+      <text x="431" y="416" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink)">"APPROVED" in feedback?</text>
+      <text x="330" y="434" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">yes → exit loop</text>
+      <text x="530" y="434" text-anchor="middle" font-size="10.5" fill="var(--ink-dim)">no → next round (max 3)</text>
+
+      <line x1="297" y1="364" x2="297" y2="392" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+      <path d="M 600 392 C 650 350, 650 200, 560 156" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow)" />
+      <text x="700" y="330" font-size="10" fill="var(--warn)" text-anchor="middle">no → loop back to</text>
+      <text x="700" y="344" font-size="10" fill="var(--warn)" text-anchor="middle">developer, round+1</text>
+
+      <line x1="431" y1="448" x2="431" y2="476" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+
+      <!-- final output -->
+      <rect x="182" y="480" width="498" height="72" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.4" />
+      <circle cx="182" cy="480" r="11" fill="var(--ink)" />
+      <text x="182" y="484" text-anchor="middle" font-size="11" font-weight="600" fill="var(--bg)">7</text>
+      <text x="431" y="506" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)">print log path, return final code</text>
+      <text x="431" y="524" text-anchor="middle" font-size="10.5" fill="var(--warn)">no pytest, no correctness check — wiring sanity check only</text>
+
+      <!-- legend -->
+      <g transform="translate(24, 460)">
+        <line x1="0" y1="4" x2="36" y2="4" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)" />
+        <text x="44" y="8" font-size="11" fill="var(--ink-dim)">code / control flow</text>
+      </g>
+    </svg>
+    <figcaption>
+      One call to <code>python3 src/main_orthestrator.py</code> drives steps 1 through 7 above:
+      the placeholder task is handed to a fresh developer/reviewer loop, every exchange is
+      logged and printed, the loop exits on approval or after 3 rounds, and the final code is
+      returned with no verification of any kind.
+    </figcaption>
+  </figure>
+
+  <div class="notes">
+    <div>
+      <h2>What it proves</h2>
+      <ul>
+        <li>Ollama is reachable at <code>127.0.0.1:11434</code> and the <code>qwen2.5-coder:7b</code> model responds to <code>.chat()</code>.</li>
+        <li>The developer/reviewer loop wiring — passing code and feedback back and forth — works end to end.</li>
+        <li><code>ConversationLogger</code> correctly writes a transcript to <code>logs/</code>.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What it does <em>not</em> prove</h2>
+      <ul>
+        <li>Whether the developer's fix is actually correct — there's no task-specific code and nothing checks the output.</li>
+        <li>Whether the agents behave the same way on a real bug — the hardcoded task is a generic placeholder, so the model effectively invents its own toy example.</li>
+        <li>For that, use <a href="architecture-diagram.html">the QuixBugs harness</a>, which feeds a real buggy program through the same loop and checks the fix with pytest.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 L22 20 H2 Z" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.2" r="0.6" fill="currentColor" stroke="none"/></svg>
+      <div>
+        <strong>Same known gap as the harness path:</strong> the loop only breaks early on the literal
+        substring <code>"APPROVED"</code>. If the model writes <code>"Approved"</code> or phrases approval
+        differently, the check misses it and the loop just burns through all 3 rounds.
+      </div>
+    </div>
+  </div>
+</main>
