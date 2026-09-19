@@ -14,6 +14,7 @@ class ConversationLogger:
         self.path = LOG_DIR / f"{stamp}.json"
         self.task = task
         self.entries = []
+        self.rounds = []
         self._write()
 
     def log(self, agent: str, round_num: int, model: str, messages: list, response: str) -> None:
@@ -29,5 +30,17 @@ class ConversationLogger:
         )
         self._write()
 
+    def log_round(self, round_num: int, code: str, reviewer_feedback: str) -> None:
+        self.rounds.append(
+            {
+                "round": round_num,
+                "code": code,
+                "reviewer_feedback": reviewer_feedback,
+            }
+        )
+        self._write()
+
     def _write(self) -> None:
-        self.path.write_text(json.dumps({"task": self.task, "entries": self.entries}, indent=2))
+        self.path.write_text(
+            json.dumps({"task": self.task, "entries": self.entries, "rounds": self.rounds}, indent=2)
+        )

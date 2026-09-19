@@ -2,8 +2,8 @@
 the fix against QuixBugs' own tests.
 
 Usage:
-    python tests/run_quixbugs.py bitcount
-    python tests/run_quixbugs.py  # runs every program in python_programs/
+    python tests/run_quixbugs-test-harness.py bitcount
+    python tests/run_quixbugs-test-harness.py  # runs every program in python_programs/
 """
 
 import re

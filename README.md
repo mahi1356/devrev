@@ -44,6 +44,12 @@ src/
 tests/
   run_quixbugs-test-harness.py   # runs a QuixBugs bug (or all 40) through the loop and checks the fix
   quixbugs/                      # the QuixBugs dataset
+docs/
+  architecture-overview.md            # how the files connect, in prose
+  improving-ollama.md                 # options for improving local model output quality
+  status-update-*.md                  # dated dev logs from past sessions
+logs/
+  <timestamp>.json         # full transcript of a run, written by ConversationLogger
 ```
 
 ## Running
@@ -57,3 +63,20 @@ Make sure `ollama serve` is running and the venv is active (see Setup), then:
 | `python3 tests/run_quixbugs-test-harness.py` | Same as above for **all 40** programs in `tests/quixbugs/python_programs/`, reporting an aggregate `N/40 passed`. | Full benchmark run across the dataset. |
 
 Every `run()` call writes a full transcript (each agent's messages and responses, per round) to `logs/<timestamp>.json`.
+
+### Cleaning up logs
+
+Raw transcripts in `logs/` are gitignored and can pile up. To pull out the reviewer feedback worth keeping and clear the rest:
+
+```bash
+python3 scripts/extract_feedback.py            # extract + delete all logs/*.json
+python3 scripts/extract_feedback.py --dry-run  # preview without writing or deleting
+python3 scripts/extract_feedback.py --keep-days 7  # only process logs older than 7 days
+```
+
+Each run's reviewer feedback (per round) is appended as one line to `logs/feedback_history.jsonl`, then the source log is deleted. That archive file is the one exception tracked in git despite `logs/` being ignored.
+
+## Docs
+
+- [docs/architecture-overview.md](docs/architecture-overview.md) — how the files connect, in prose.
+- [docs/improving-ollama.md](docs/improving-ollama.md) — options for improving the local model's output quality.

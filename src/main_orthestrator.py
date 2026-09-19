@@ -16,6 +16,7 @@ def run(task: str, code: str = "") -> str:
     for round_num in range(1, MAX_ROUNDS + 1):
         code = developer.run(task, code=code, feedback=feedback, logger=logger, round_num=round_num)
         feedback = reviewer.run(task, code=code, logger=logger, round_num=round_num)
+        logger.log_round(round_num, code, feedback)
         print(f"--- Round {round_num} ---\nCode:\n{code}\n\nReview:\n{feedback}\n")
 
         if "APPROVED" in feedback:

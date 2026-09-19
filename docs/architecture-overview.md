@@ -14,10 +14,14 @@ benchmark.
 - **[reviewer_agent.py](../src/reviewer_agent.py)** — `ReviewerAgent` calls the
   same model with a different system prompt: critique the developer's code, or
   reply `APPROVED` if it's fine.
-- **[main.py](../src/main.py)** — the orchestrator. `run(task, code)`
+- **[main_orthestrator.py](../src/main_orthestrator.py)** — the orchestrator. `run(task, code)`
   alternates developer → reviewer up to `MAX_ROUNDS = 3`, feeding each
   reviewer critique back into the next developer call, and stops early if
   `"APPROVED"` appears in the feedback.
+- **[conversation_logger.py](../src/conversation_logger.py)** — `ConversationLogger`
+  records every agent/Ollama exchange (messages + response, per round) to
+  `logs/<timestamp>.json`, rewriting the file after each round so a killed run
+  still leaves a partial transcript.
 
 ### Dependencies / config
 
@@ -30,7 +34,7 @@ benchmark.
 
 ### Test harness (`tests/`)
 
-- **[run_quixbugs.py](../tests/run_quixbugs.py)** — bridges the agent loop to
+- **[run_quixbugs-test-harness.py](../tests/run_quixbugs-test-harness.py)** — bridges the agent loop to
   a real benchmark: for each QuixBugs program, it feeds the buggy source into
   `main.run()` as a "fix this bug" task, regex-extracts the code block from
   the agent's final reply, temporarily overwrites the real QuixBugs source
@@ -41,7 +45,7 @@ benchmark.
 - **`tests/quixbugs/`** — the vendored QuixBugs dataset itself (40 classic
   algorithms in Python + Java, each with a known one-line bug, correct
   reference versions, and pytest test cases). This is pure external fixture
-  data that `run_quixbugs.py` reads/writes into — not code you'd modify.
+  data that `run_quixbugs-test-harness.py` reads/writes into — not code you'd modify.
 
 ### Docs
 
@@ -56,14 +60,15 @@ benchmark.
   log of a past session: migrating off the Anthropic API to Ollama, building
   the QuixBugs harness, and known issues (e.g. reviewer inconsistently says
   "Approved" vs "APPROVED", which affects the strict substring check in
-  `main.py`'s loop-exit condition).
+  `main_orthestrator.py`'s loop-exit condition).
 
 ## The data flow
 
 ```
-run_quixbugs.py
-  -> main.run()
+run_quixbugs-test-harness.py
+  -> main_orthestrator.run()
        -> alternates DeveloperAgent / ReviewerAgent (both hit local Ollama)
+       -> ConversationLogger records every exchange to logs/<timestamp>.json
   -> extracted fix swapped into tests/quixbugs/python_programs/<name>.py
   -> QuixBugs' own pytest suite verifies it
   -> original buggy file restored
@@ -72,6 +77,6 @@ run_quixbugs.py
 ## Known issue
 
 The strict substring match `"APPROVED" in feedback` in
-[main.py:19](../src/main.py#L19) can miss approvals when the model writes
+[main_orthestrator.py:19](../src/main_orthestrator.py#L19) can miss approvals when the model writes
 "Approved" instead of "APPROVED" — noted in the status update but not yet
 fixed.
